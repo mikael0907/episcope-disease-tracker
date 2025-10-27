@@ -1,0 +1,6 @@
+role:
+researcher,
+public user,
+health worker,
+organization,
+government,
