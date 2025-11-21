@@ -22,16 +22,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Supabase
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-  );
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -59,7 +52,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     // Listen to Supabase auth state changes
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       final event = data.event;
-      
+
       if (event == AuthChangeEvent.signedIn) {
         // User signed in - update provider
         ref.read(authControllerProvider.notifier).checkAuthStatus();
@@ -79,14 +72,14 @@ class _MyAppState extends ConsumerState<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'EpiScope',
+      title: 'EpiVigil',
       theme: AppThemes.light,
       darkTheme: AppThemes.dark,
-      themeMode: ThemeMode.system,
-      
+      themeMode: ThemeMode.light,
+
       // Use initialRoute
       initialRoute: '/',
-      
+
       routes: {
         '/': (context) => const AuthCheckScreen(),
         '/logo': (context) => const LogoScreen(),
@@ -115,11 +108,7 @@ class AuthCheckScreen extends ConsumerWidget {
 
     // Show loading while checking auth
     if (authStatus == AuthStatus.loading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     // Navigate based on auth status using WidgetsBinding to avoid build-time navigation
@@ -134,11 +123,7 @@ class AuthCheckScreen extends ConsumerWidget {
     });
 
     // Show loading indicator while navigation happens
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
+    return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }
 

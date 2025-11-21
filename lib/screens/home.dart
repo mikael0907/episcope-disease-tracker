@@ -21,14 +21,15 @@ class Home extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<Home> {
   int _selectedDaysFilter = 30; // Default to 30 days
-  
+
   @override
   Widget build(BuildContext context) {
     // Get current user from provider
     final currentUser = ref.watch(currentUserProvider);
     final userName = currentUser?.firstName ?? 'User';
-    final isAdmin = currentUser?.role == 'admin' || currentUser?.role == 'government';
-    
+    final isAdmin =
+        currentUser?.role == 'admin' || currentUser?.role == 'government';
+
     // Watch home screen data
     final homeDataAsync = ref.watch(homeScreenDataProvider);
 
@@ -45,7 +46,7 @@ class _HomeState extends ConsumerState<Home> {
           ),
         ),
         title: const StyledText(
-          text: "EpiScope",
+          text: "EpiVigil",
           fontSize: 24,
           color: Colors.white,
           fontWeight: FontWeight.bold,
@@ -75,23 +76,26 @@ class _HomeState extends ConsumerState<Home> {
         ),
       ),
       body: homeDataAsync.when(
-        data: (homeData) => _buildHomeContent(context, homeData, currentUser?.id, isAdmin),
+        data:
+            (homeData) =>
+                _buildHomeContent(context, homeData, currentUser?.id, isAdmin),
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              Text('Error loading data: $error'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.refresh(homeScreenDataProvider),
-                child: const Text('Retry'),
+        error:
+            (error, stack) => Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text('Error loading data: $error'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => ref.refresh(homeScreenDataProvider),
+                    child: const Text('Retry'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
       bottomNavigationBar: const UserNavigationBar(currentIndex: 0),
     );
@@ -106,14 +110,17 @@ class _HomeState extends ConsumerState<Home> {
     final totalCases = homeData['totalCases'] as int;
     final lastUpdated = homeData['lastUpdated'] as DateTime;
     final trendingDiseases = homeData['trendingDiseases'] as Map<String, int>;
-    
+
     // Watch daily cases based on selected filter
-    final dailyCasesAsync = ref.watch(dailyNewCasesProvider(_selectedDaysFilter));
-    
+    final dailyCasesAsync = ref.watch(
+      dailyNewCasesProvider(_selectedDaysFilter),
+    );
+
     // Get user's report count
-    final userReportsAsync = userId != null 
-        ? ref.watch(userReportsCountProvider(userId))
-        : const AsyncValue.data(0);
+    final userReportsAsync =
+        userId != null
+            ? ref.watch(userReportsCountProvider(userId))
+            : const AsyncValue.data(0);
 
     // Convert trending diseases to chart data
     final colors = [
@@ -128,36 +135,27 @@ class _HomeState extends ConsumerState<Home> {
       const Color(0xFFF97316), // Orange
       const Color(0xFF6366F1), // Indigo
     ];
-    
+
     // Process trending diseases - ensure we have proper data
     //lib/screens/home.dart
 
-// Replace lines 133-141 with this:
+    // Replace lines 133-141 with this:
 
-// Process trending diseases - ensure we have proper data
-final trendingDiseasesEntries = trendingDiseases.entries
-    .where((entry) => entry.value > 0)
-    .toList();
+    // Process trending diseases - ensure we have proper data
+    final trendingDiseasesEntries =
+        trendingDiseases.entries.where((entry) => entry.value > 0).toList();
 
-trendingDiseasesEntries.sort((a, b) => b.value.compareTo(a.value));
+    trendingDiseasesEntries.sort((a, b) => b.value.compareTo(a.value));
 
-final trendingDiseasesList = trendingDiseasesEntries
-    .take(5)
-    .toList()
-    .asMap()
-    .entries
-    .map((entry) {
-  final diseaseEntry = entry.value;
-  final diseaseName = diseaseEntry.key;
-  final cases = diseaseEntry.value;
-  final color = colors[entry.key % colors.length];
-  
-  return DiseaseCases(
-    diseaseName,
-    cases,
-    color,
-  );
-}).toList();
+    final trendingDiseasesList =
+        trendingDiseasesEntries.take(5).toList().asMap().entries.map((entry) {
+          final diseaseEntry = entry.value;
+          final diseaseName = diseaseEntry.key;
+          final cases = diseaseEntry.value;
+          final color = colors[entry.key % colors.length];
+
+          return DiseaseCases(diseaseName, cases, color);
+        }).toList();
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -175,45 +173,55 @@ final trendingDiseasesList = trendingDiseasesEntries
           children: [
             _createTotalCases(context, totalCases, lastUpdated),
             const SizedBox(height: 24),
-            
+
             // Add Admin Access Card if user is admin
             if (isAdmin) ...[
               _buildAdminAccessCard(context),
               const SizedBox(height: 24),
             ],
-            
+
             // Show trending diseases chart only if we have data
             if (trendingDiseasesList.isNotEmpty) ...[
               _trendingDiseasesChart(trendingDiseasesList),
               const SizedBox(height: 24),
             ] else ...[
-              _buildNoDataCard('No disease data available. Reports will appear here once users start reporting cases.'),
+              _buildNoDataCard(
+                'No disease data available. Reports will appear here once users start reporting cases.',
+              ),
               const SizedBox(height: 24),
             ],
-            
+
             // Daily cases chart with filter
             dailyCasesAsync.when(
-              data: (dailyCases) => dailyCases.isNotEmpty
-                  ? _newDailyCasesChart(dailyCases)
-                  : _buildNoDataCard('No daily case data available for the selected period'),
-              loading: () => const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-              ),
-              error: (error, stack) => _buildErrorCard('Failed to load daily cases'),
+              data:
+                  (dailyCases) =>
+                      dailyCases.isNotEmpty
+                          ? _newDailyCasesChart(dailyCases)
+                          : _buildNoDataCard(
+                            'No daily case data available for the selected period',
+                          ),
+              loading:
+                  () => const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
+              error:
+                  (error, stack) =>
+                      _buildErrorCard('Failed to load daily cases'),
             ),
             const SizedBox(height: 24),
-            
+
             userReportsAsync.when(
               data: (count) => _yourReportsCard(context, count),
-              loading: () => const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-              ),
+              loading:
+                  () => const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+                  ),
               error: (error, stack) => _yourReportsCard(context, 0),
             ),
             const SizedBox(height: 24),
@@ -231,19 +239,26 @@ final trendingDiseasesList = trendingDiseasesEntries
     );
   }
 
-  Widget _createTotalCases(BuildContext context, int totalCases, DateTime lastUpdated) {
+  Widget _createTotalCases(
+    BuildContext context,
+    int totalCases,
+    DateTime lastUpdated,
+  ) {
     final now = DateTime.now();
     final difference = now.difference(lastUpdated);
-    
+
     String timeAgo;
     if (difference.inMinutes < 1) {
       timeAgo = 'Just now';
     } else if (difference.inMinutes < 60) {
-      timeAgo = '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
+      timeAgo =
+          '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
     } else if (difference.inHours < 24) {
-      timeAgo = '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
+      timeAgo =
+          '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
     } else {
-      timeAgo = '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
+      timeAgo =
+          '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
     }
 
     return Container(
@@ -253,11 +268,7 @@ final trendingDiseasesList = trendingDiseasesEntries
         color: const Color(0xFF3B82F6),
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -296,7 +307,11 @@ final trendingDiseasesList = trendingDiseasesEntries
         child: Column(
           children: [
             const ListTile(
-              leading: Icon(Icons.admin_panel_settings, color: Colors.blue, size: 40),
+              leading: Icon(
+                Icons.admin_panel_settings,
+                color: Colors.blue,
+                size: 40,
+              ),
               title: Text(
                 'Admin Dashboard',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -333,10 +348,7 @@ final trendingDiseasesList = trendingDiseasesEntries
                 SizedBox(width: 8),
                 Text(
                   "Trending Diseases",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ],
             ),
@@ -370,7 +382,10 @@ final trendingDiseasesList = trendingDiseasesEntries
                     color: Color(0xFF1E293B),
                   ),
                   title: const AxisTitle(text: 'Number of Cases'),
-                  majorGridLines: const MajorGridLines(width: 1, color: Color(0xFFE5E7EB)),
+                  majorGridLines: const MajorGridLines(
+                    width: 1,
+                    color: Color(0xFFE5E7EB),
+                  ),
                 ),
                 tooltipBehavior: TooltipBehavior(
                   enable: true,
@@ -413,30 +428,31 @@ final trendingDiseasesList = trendingDiseasesEntries
     return Wrap(
       spacing: 16,
       runSpacing: 8,
-      children: diseases.asMap().entries.map((entry) {
-        final disease = entry.value;
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(
-                color: disease.color,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              '${entry.key + 1}. ${disease.disease}',
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        );
-      }).toList(),
+      children:
+          diseases.asMap().entries.map((entry) {
+            final disease = entry.value;
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 12,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: disease.color,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '${entry.key + 1}. ${disease.disease}',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
     );
   }
 
@@ -598,18 +614,11 @@ final trendingDiseasesList = trendingDiseasesEntries
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            const Icon(
-              Icons.info_outline,
-              size: 48,
-              color: Colors.grey,
-            ),
+            const Icon(Icons.info_outline, size: 48, color: Colors.grey),
             const SizedBox(height: 16),
             Text(
               message,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ],
@@ -626,18 +635,11 @@ final trendingDiseasesList = trendingDiseasesEntries
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 48,
-              color: Colors.red,
-            ),
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               message,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.red,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.red),
               textAlign: TextAlign.center,
             ),
           ],

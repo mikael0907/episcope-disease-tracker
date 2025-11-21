@@ -1,55 +1,57 @@
+// lib/shared/theme.dart
+
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  // Common colors (used in both themes)
+  // Common brand colors
   static const primary = Color(0xFF3F3D56);
   static const secondary = Color(0xFFFACC15);
   static const error = Color(0xFFEF4444);
   static const success = Color(0xFF10B981);
 
-  // Light theme colors
+  // Light theme base colors
   static const lightBackground = Color(0xFFF8FAFC);
   static const lightSurface = Color(0xFFFFFFFF);
-  static const lightText = Color(0xFF1E293B);
-  static const lightInputFill = Color(0xFFE2E8F0);
 
-  // Dark theme colors
-  static const darkBackground = Color(0xFF1E293B);
-  static const darkSurface = Color(0xFF334155);
-  static const darkText = Color(0xFFE5E7EB);
-  static const darkInputFill = Color(0xFF334155);
+  // Dark theme base colors
+  static const darkBackground = Color(0xFF0F172A);
+  static const darkSurface = Color(0xFF1E293B);
 }
 
 class AppThemes {
-  // Main font family
   static final _font = GoogleFonts.poppins();
 
-  /// 🎨 Light Theme
+  /// 🎨 LIGHT THEME
   static final ThemeData light = ThemeData(
     brightness: Brightness.light,
-    scaffoldBackgroundColor: AppColors.lightBackground,
-    fontFamily: _font.fontFamily,
     primaryColor: AppColors.primary,
-    canvasColor: AppColors.lightSurface,
+    scaffoldBackgroundColor: AppColors.lightBackground,
     cardColor: AppColors.lightSurface,
-    hintColor: AppColors.lightInputFill,
+    canvasColor: AppColors.lightSurface,
+    fontFamily: _font.fontFamily,
 
-    textTheme: TextTheme(
-      bodyLarge: _font.copyWith(color: AppColors.lightText),
-      bodyMedium: _font.copyWith(color: AppColors.lightText),
-      titleLarge: _font.copyWith(
-        color: AppColors.lightText,
-        fontWeight: FontWeight.bold,
-      ),
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      brightness: Brightness.light,
+    ),
+
+    textTheme: GoogleFonts.poppinsTextTheme().apply(
+      bodyColor: Colors.black87,
+      displayColor: Colors.black87,
     ),
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.lightInputFill,
+      fillColor: const Color(0xFFE2E8F0),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
       ),
     ),
 
@@ -59,42 +61,51 @@ class AppThemes {
         foregroundColor: Colors.white,
         textStyle: _font.copyWith(fontWeight: FontWeight.bold),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       ),
     ),
 
-    colorScheme: ColorScheme.light(
-      primary: AppColors.primary,
-      secondary: AppColors.secondary,
-      error: AppColors.error,
-      surface: AppColors.lightSurface,
+    appBarTheme: AppBarTheme(
+      elevation: 0,
+      backgroundColor: AppColors.lightSurface,
+      titleTextStyle: _font.copyWith(
+        color: AppColors.primary,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
+      iconTheme: const IconThemeData(color: AppColors.primary),
     ),
   );
 
-  /// 🌙 Dark Theme
+  /// 🌙 DARK THEME
   static final ThemeData dark = ThemeData(
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: AppColors.darkBackground,
-    fontFamily: _font.fontFamily,
     primaryColor: AppColors.primary,
-    canvasColor: AppColors.darkBackground,
-    cardColor: AppColors.darkBackground,
-    hintColor: AppColors.darkInputFill,
+    scaffoldBackgroundColor: AppColors.darkBackground,
+    cardColor: AppColors.darkSurface,
+    canvasColor: AppColors.darkSurface,
+    fontFamily: _font.fontFamily,
 
-    textTheme: TextTheme(
-      bodyLarge: _font.copyWith(color: AppColors.darkText),
-      bodyMedium: _font.copyWith(color: AppColors.darkText),
-      titleLarge: _font.copyWith(
-        color: Colors.white,
-        fontWeight: FontWeight.bold,
-      ),
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      brightness: Brightness.dark,
+    ),
+
+    textTheme: GoogleFonts.poppinsTextTheme().apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
     ),
 
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppColors.darkInputFill,
+      fillColor: const Color(0xFF334155),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: Color(0xFF475569)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: const BorderSide(color: AppColors.secondary, width: 1.5),
       ),
     ),
 
@@ -104,14 +115,19 @@ class AppThemes {
         foregroundColor: Colors.white,
         textStyle: _font.copyWith(fontWeight: FontWeight.bold),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       ),
     ),
 
-    colorScheme: ColorScheme.dark(
-      primary: AppColors.primary,
-      secondary: AppColors.secondary,
-      error: AppColors.error,
-      surface: AppColors.darkSurface,
+    appBarTheme: AppBarTheme(
+      elevation: 0,
+      backgroundColor: AppColors.darkSurface,
+      titleTextStyle: _font.copyWith(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
+      iconTheme: const IconThemeData(color: Colors.white),
     ),
   );
 }
